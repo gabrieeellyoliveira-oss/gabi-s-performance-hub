@@ -7,7 +7,7 @@ export function useProfile() {
     queryFn: async () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) return null;
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("profiles")
         .select("*")
         .eq("id", userData.user.id)

@@ -33,7 +33,7 @@ function MetasPage() {
   const { data: metas } = useQuery({
     queryKey: ["metas"],
     queryFn: async () => {
-      const { data } = await supabase.from("dashboard_metas").select("*").eq("id", "singleton").maybeSingle();
+      const { data } = await (supabase as any).from("dashboard_metas").select("*").eq("id", "singleton").maybeSingle();
       return (data as any) ?? { m1: 121, m2: 135, m3: 141 };
     },
   });
@@ -87,15 +87,15 @@ function MetasPage() {
   }, [ganhos]);
 
   async function addGanho() {
-    const { error } = await supabase.from("dashboard_ganhos").insert({ perfil: "bibi", data_ganho: hojeISO(), quantidade: 1 });
+    const { error } = await (supabase as any).from("dashboard_ganhos").insert({ perfil: "bibi", data_ganho: hojeISO(), quantidade: 1 });
     if (error) return toast.error(error.message);
     toast.success("+1 ganho!");
     qc.invalidateQueries({ queryKey: ["ganhos-mes"] });
   }
   async function removeGanho() {
-    const { data } = await supabase.from("dashboard_ganhos").select("id").eq("data_ganho", hojeISO()).order("id", { ascending: false }).limit(1);
+    const { data } = await (supabase as any).from("dashboard_ganhos").select("id").eq("data_ganho", hojeISO()).order("id", { ascending: false }).limit(1);
     if (!data?.length) return toast.warning("Nenhum ganho hoje.");
-    const { error } = await supabase.from("dashboard_ganhos").delete().eq("id", (data[0] as any).id);
+    const { error } = await (supabase as any).from("dashboard_ganhos").delete().eq("id", (data[0] as any).id);
     if (error) return toast.error(error.message);
     toast.success("-1 ganho");
     qc.invalidateQueries({ queryKey: ["ganhos-mes"] });
@@ -104,7 +104,7 @@ function MetasPage() {
   async function salvarMetas(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const { error } = await supabase.from("dashboard_metas").upsert({
+    const { error } = await (supabase as any).from("dashboard_metas").upsert({
       id: "singleton",
       m1: Number(fd.get("m1")), m2: Number(fd.get("m2")), m3: Number(fd.get("m3")),
       mes: new Date().toISOString().slice(0, 7),
